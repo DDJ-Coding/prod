@@ -60,12 +60,16 @@ function Router() {
         <Route path="/student/schedule" component={Schedule} />
         <Route path="/student/progress" component={Progress} />
         <Route path="/student/certifications" component={Certifications} />
+        <Route path="/student/messages" component={StudentMessages} />
+        <Route path="/student/messages/:contactId" component={StudentMessages} />
         
         {/* Instructor routes */}
         <Route path="/instructor/dashboard" component={InstructorDashboard} />
         <Route path="/instructor/students" component={Students} />
         <Route path="/instructor/bookings" component={Bookings} />
         <Route path="/instructor/reports" component={Reports} />
+        <Route path="/instructor/messages" component={InstructorMessages} />
+        <Route path="/instructor/messages/:contactId" component={InstructorMessages} />
         
         {/* Fallback to 404 */}
         <Route component={NotFound} />

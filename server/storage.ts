@@ -241,6 +241,85 @@ export class MemStorage implements IStorage {
       status: "approved"
     });
     
+    // Additional flight logs for student1 with various types and durations
+    this.createFlightLog({
+      studentId: student1.id,
+      instructorId: instructor1.id,
+      aircraftId: aircraft3.id,
+      date: new Date("2023-04-28"),
+      duration: 4.5,
+      departureAirport: "KBOS",
+      destinationAirport: "KBDL",
+      returnAirport: "KBOS",
+      flightType: "cross-country",
+      status: "approved"
+    });
+    
+    this.createFlightLog({
+      studentId: student1.id,
+      instructorId: instructor1.id,
+      aircraftId: aircraft1.id,
+      date: new Date("2023-04-20"),
+      duration: 2.0,
+      departureAirport: "KBOS",
+      destinationAirport: "Local",
+      flightType: "dual",
+      notes: "Night flying practice",
+      status: "approved"
+    });
+    
+    this.createFlightLog({
+      studentId: student1.id,
+      aircraftId: aircraft1.id,
+      date: new Date("2023-04-15"),
+      duration: 2.2,
+      departureAirport: "KBOS",
+      destinationAirport: "KBED",
+      returnAirport: "KBOS",
+      flightType: "solo",
+      status: "approved"
+    });
+    
+    this.createFlightLog({
+      studentId: student1.id,
+      instructorId: instructor2.id,
+      aircraftId: aircraft2.id,
+      date: new Date("2023-04-10"),
+      duration: 3.5,
+      departureAirport: "KBOS",
+      destinationAirport: "KMHT",
+      returnAirport: "KBOS",
+      flightType: "cross-country",
+      status: "approved"
+    });
+    
+    this.createFlightLog({
+      studentId: student1.id,
+      instructorId: instructor1.id,
+      aircraftId: aircraft1.id,
+      date: new Date("2023-04-05"),
+      duration: 1.8,
+      departureAirport: "KBOS",
+      destinationAirport: "Local",
+      flightType: "dual",
+      notes: "Emergency procedures practice",
+      status: "approved"
+    });
+    
+    // Add a pending flight log for review
+    this.createFlightLog({
+      studentId: student1.id,
+      aircraftId: aircraft1.id,
+      date: new Date(),
+      duration: 1.7,
+      departureAirport: "KBOS",
+      destinationAirport: "KBED",
+      returnAirport: "KBOS",
+      flightType: "solo",
+      notes: "Pattern work and landings",
+      status: "pending"
+    });
+    
     // Create bookings for student1
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -254,6 +333,35 @@ export class MemStorage implements IStorage {
       aircraftId: aircraft1.id,
       status: "confirmed",
       notes: "Traffic Pattern Practice"
+    });
+    
+    // Reset tomorrow for next booking
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+    
+    this.createBooking({
+      studentId: student1.id,
+      instructorId: instructor2.id,
+      startTime: new Date(dayAfterTomorrow.setHours(10, 0, 0, 0)),
+      endTime: new Date(dayAfterTomorrow.setHours(12, 0, 0, 0)),
+      trainingType: "maneuvers",
+      aircraftId: aircraft2.id,
+      status: "confirmed",
+      notes: "Slow Flight and Stall Practice"
+    });
+    
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    this.createBooking({
+      studentId: student1.id,
+      instructorId: instructor1.id,
+      startTime: new Date(nextWeek.setHours(9, 0, 0, 0)),
+      endTime: new Date(nextWeek.setHours(12, 0, 0, 0)),
+      trainingType: "navigation",
+      aircraftId: aircraft1.id,
+      status: "confirmed",
+      notes: "VOR Navigation Practice"
     });
     
     const may25 = new Date();
@@ -284,6 +392,22 @@ export class MemStorage implements IStorage {
       aircraftId: aircraft1.id,
       status: "confirmed",
       notes: "Instrument Training"
+    });
+    
+    // Add a pending booking request
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    nextMonth.setDate(15);
+    
+    this.createBooking({
+      studentId: student1.id,
+      instructorId: instructor1.id,
+      startTime: new Date(nextMonth.setHours(13, 0, 0, 0)),
+      endTime: new Date(nextMonth.setHours(15, 0, 0, 0)),
+      trainingType: "checkride-prep",
+      aircraftId: aircraft1.id,
+      status: "pending",
+      notes: "Checkride Preparation"
     });
 
     // Create demo messages
