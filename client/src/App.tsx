@@ -18,12 +18,14 @@ import FlightLogs from "@/pages/student/FlightLogs";
 import Schedule from "@/pages/student/Schedule";
 import Progress from "@/pages/student/Progress";
 import Certifications from "@/pages/student/Certifications";
+import StudentMessages from "@/pages/student/Messages";
 
 // Instructor pages
 import InstructorDashboard from "@/pages/instructor/Dashboard";
 import Students from "@/pages/instructor/Students";
 import Bookings from "@/pages/instructor/Bookings";
 import Reports from "@/pages/instructor/Reports";
+import InstructorMessages from "@/pages/instructor/Messages";
 
 function Router() {
   const [location] = useLocation();

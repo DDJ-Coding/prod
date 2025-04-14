@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import session from "express-session";
 import { z } from "zod";
-import { insertUserSchema, insertBookingSchema, insertFlightLogSchema, insertMilestoneSchema } from "@shared/schema";
+import { insertUserSchema, insertBookingSchema, insertFlightLogSchema, insertMilestoneSchema, insertMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -318,6 +318,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       email: student.email,
       profileImage: student.profileImage
     })));
+  });
+
+  // ===================== MESSAGING ROUTES =====================
+  app.get("/api/messages/contacts", authenticateUser, async (req, res) => {
+    const userId = req.session.userId!;
+    
+    try {
+      const contacts = await storage.getMessageContacts(userId);
+      return res.status(200).json(contacts);
+    } catch (error) {
+      return res.status(500).json({ message: "Error fetching contacts" });
+    }
+  });
+
+  app.get("/api/messages/:contactId", authenticateUser, async (req, res) => {
+    const userId = req.session.userId!;
+    const contactId = parseInt(req.params.contactId);
+    
+    try {
+      const messages = await storage.getMessagesBetweenUsers(userId, contactId);
+      
+      // Mark messages from contact as read
+      await storage.markMessagesAsRead(contactId, userId);
+      
+      return res.status(200).json(messages);
+    } catch (error) {
+      return res.status(500).json({ message: "Error fetching messages" });
+    }
+  });
+
+  app.post("/api/messages", authenticateUser, async (req, res) => {
+    const senderId = req.session.userId!;
+    const { receiverId, content } = req.body;
+    
+    if (!receiverId || !content) {
+      return res.status(400).json({ message: "Receiver ID and content are required" });
+    }
+    
+    try {
+      const message = await storage.createMessage({
+        senderId,
+        receiverId,
+        content,
+        timestamp: new Date(),
+        isRead: false
+      });
+      
+      return res.status(201).json(message);
+    } catch (error) {
+      return res.status(500).json({ message: "Error sending message" });
+    }
+  });
+
+  app.patch("/api/messages/read/:senderId", authenticateUser, async (req, res) => {
+    const receiverId = req.session.userId!;
+    const senderId = parseInt(req.params.senderId);
+    
+    try {
+      await storage.markMessagesAsRead(senderId, receiverId);
+      return res.status(200).json({ message: "Messages marked as read" });
+    } catch (error) {
+      return res.status(500).json({ message: "Error marking messages as read" });
+    }
   });
 
   return httpServer;

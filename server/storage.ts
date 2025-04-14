@@ -61,6 +61,22 @@ export interface IStorage {
     todayBookings: Booking[];
     pendingLogs: FlightLog[];
   }>;
+
+  // Message operations
+  getMessage(id: number): Promise<Message | undefined>;
+  getMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[]>;
+  getMessagesForUser(userId: number): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessagesAsRead(senderId: number, receiverId: number): Promise<void>;
+  getMessageContacts(userId: number): Promise<{
+    id: number;
+    name: string;
+    role: string;
+    lastMessage?: string;
+    lastMessageTime?: string;
+    unreadCount: number;
+    profileImage?: string;
+  }[]>;
 }
 
 // In-memory storage implementation
@@ -70,12 +86,14 @@ export class MemStorage implements IStorage {
   private bookings: Map<number, Booking>;
   private flightLogs: Map<number, FlightLog>;
   private milestones: Map<number, Milestone>;
+  private messages: Map<number, Message>;
   
   private userIdCounter: number;
   private aircraftIdCounter: number;
   private bookingIdCounter: number;
   private flightLogIdCounter: number;
   private milestoneIdCounter: number;
+  private messageIdCounter: number;
 
   constructor() {
     this.users = new Map();
@@ -83,12 +101,14 @@ export class MemStorage implements IStorage {
     this.bookings = new Map();
     this.flightLogs = new Map();
     this.milestones = new Map();
+    this.messages = new Map();
     
     this.userIdCounter = 1;
     this.aircraftIdCounter = 1;
     this.bookingIdCounter = 1;
     this.flightLogIdCounter = 1;
     this.milestoneIdCounter = 1;
+    this.messageIdCounter = 1;
     
     // Initialize with some demo data
     this.initializeDemoData();
@@ -264,6 +284,39 @@ export class MemStorage implements IStorage {
       aircraftId: aircraft1.id,
       status: "confirmed",
       notes: "Instrument Training"
+    });
+
+    // Create demo messages
+    this.createMessage({
+      senderId: instructor1.id,
+      receiverId: student1.id,
+      content: "Hi Alex, just confirming our flight tomorrow at 2PM. Please arrive 30 minutes early for preflight.",
+      timestamp: new Date(new Date().setHours(new Date().getHours() - 25)),
+      isRead: true
+    });
+
+    this.createMessage({
+      senderId: student1.id,
+      receiverId: instructor1.id,
+      content: "Thanks for the reminder, Sarah! I'll be there at 1:30PM.",
+      timestamp: new Date(new Date().setHours(new Date().getHours() - 24)),
+      isRead: true
+    });
+
+    this.createMessage({
+      senderId: instructor1.id,
+      receiverId: student1.id,
+      content: "Great! Don't forget to bring your logbook and flight plan. We'll be focusing on pattern work.",
+      timestamp: new Date(new Date().setHours(new Date().getHours() - 23)),
+      isRead: true
+    });
+
+    this.createMessage({
+      senderId: instructor2.id,
+      receiverId: student1.id,
+      content: "Hello Alex, I've reviewed your latest flight log. Good job on the cross-country navigation!",
+      timestamp: new Date(new Date().setHours(new Date().getHours() - 10)),
+      isRead: false
     });
   }
 
@@ -537,6 +590,98 @@ export class MemStorage implements IStorage {
       todayBookings,
       pendingLogs
     };
+  }
+
+  // Message Operations
+  async getMessage(id: number): Promise<Message | undefined> {
+    return this.messages.get(id);
+  }
+
+  async getMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(message => 
+        (message.senderId === userId1 && message.receiverId === userId2) || 
+        (message.senderId === userId2 && message.receiverId === userId1)
+      )
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }
+
+  async getMessagesForUser(userId: number): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(message => message.senderId === userId || message.receiverId === userId)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const id = this.messageIdCounter++;
+    const message: Message = { ...insertMessage, id };
+    this.messages.set(id, message);
+    return message;
+  }
+
+  async markMessagesAsRead(senderId: number, receiverId: number): Promise<void> {
+    Array.from(this.messages.values())
+      .filter(message => message.senderId === senderId && message.receiverId === receiverId && !message.isRead)
+      .forEach(message => {
+        const updatedMessage = { ...message, isRead: true };
+        this.messages.set(message.id, updatedMessage);
+      });
+  }
+
+  async getMessageContacts(userId: number): Promise<{
+    id: number;
+    name: string;
+    role: string;
+    lastMessage?: string;
+    lastMessageTime?: string;
+    unreadCount: number;
+    profileImage?: string;
+  }[]> {
+    // Get all unique users that the current user has exchanged messages with
+    const contactIds = new Set<number>();
+    
+    Array.from(this.messages.values())
+      .filter(message => message.senderId === userId || message.receiverId === userId)
+      .forEach(message => {
+        const contactId = message.senderId === userId ? message.receiverId : message.senderId;
+        contactIds.add(contactId);
+      });
+    
+    // Create contact objects with last message and unread count
+    const contacts = await Promise.all(
+      Array.from(contactIds).map(async (contactId) => {
+        const contact = await this.getUser(contactId);
+        if (!contact) return null;
+        
+        const messagesWithContact = await this.getMessagesBetweenUsers(userId, contactId);
+        const lastMessage = messagesWithContact.length > 0 
+          ? messagesWithContact[messagesWithContact.length - 1] 
+          : null;
+          
+        const unreadCount = messagesWithContact
+          .filter(message => message.senderId === contactId && !message.isRead)
+          .length;
+          
+        return {
+          id: contactId,
+          name: `${contact.firstName} ${contact.lastName}`,
+          role: contact.role,
+          lastMessage: lastMessage?.content,
+          lastMessageTime: lastMessage?.timestamp,
+          unreadCount,
+          profileImage: contact.profileImage
+        };
+      })
+    );
+    
+    // Sort contacts by last message time (most recent first)
+    return contacts
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (!a.lastMessageTime) return 1;
+        if (!b.lastMessageTime) return -1;
+        return new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime();
+      });
   }
 }
 
