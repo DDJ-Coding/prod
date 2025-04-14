@@ -121,6 +121,25 @@ export const insertMilestoneSchema = createInsertSchema(milestones)
     progress: true,
   });
 
+// Messages table
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull().references(() => users.id),
+  receiverId: integer("receiver_id").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  isRead: boolean("is_read").notNull().default(false),
+});
+
+export const insertMessageSchema = createInsertSchema(messages)
+  .pick({
+    senderId: true,
+    receiverId: true,
+    content: true,
+    timestamp: true,
+    isRead: true,
+  });
+
 // Type definitions
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -136,3 +155,6 @@ export type InsertFlightLog = z.infer<typeof insertFlightLogSchema>;
 
 export type Milestone = typeof milestones.$inferSelect;
 export type InsertMilestone = z.infer<typeof insertMilestoneSchema>;
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;

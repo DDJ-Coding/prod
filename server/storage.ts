@@ -1,10 +1,11 @@
 import { 
-  users, aircraft, bookings, flightLogs, milestones,
+  users, aircraft, bookings, flightLogs, milestones, messages,
   type User, type InsertUser,
   type Aircraft, type InsertAircraft,
   type Booking, type InsertBooking,
   type FlightLog, type InsertFlightLog,
-  type Milestone, type InsertMilestone
+  type Milestone, type InsertMilestone,
+  type Message, type InsertMessage
 } from "@shared/schema";
 
 // Storage interface
