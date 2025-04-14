@@ -220,6 +220,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const flightLogs = await storage.getFlightLogsByStudent(userId);
     return res.status(200).json(flightLogs);
   });
+  
+  app.get("/api/flightlogs/student", authenticateUser, authorizeRole(["student"]), async (req, res) => {
+    const userId = req.session.userId!;
+    const flightLogs = await storage.getFlightLogsByStudent(userId);
+    return res.status(200).json(flightLogs);
+  });
 
   app.post("/api/flightlogs", authenticateUser, validateBody(insertFlightLogSchema), async (req, res) => {
     try {
@@ -250,6 +256,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===================== MILESTONE ROUTES =====================
   app.get("/api/milestones", authenticateUser, authorizeRole(["student"]), async (req, res) => {
+    const userId = req.session.userId!;
+    const milestones = await storage.getMilestonesByStudent(userId);
+    return res.status(200).json(milestones);
+  });
+  
+  app.get("/api/milestones/student", authenticateUser, authorizeRole(["student"]), async (req, res) => {
     const userId = req.session.userId!;
     const milestones = await storage.getMilestonesByStudent(userId);
     return res.status(200).json(milestones);
