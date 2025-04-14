@@ -146,7 +146,7 @@ const NewFlightLogModal: React.FC<NewFlightLogModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto">
+      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Flight Log</DialogTitle>
         </DialogHeader>

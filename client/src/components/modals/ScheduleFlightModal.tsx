@@ -187,7 +187,7 @@ const ScheduleFlightModal: React.FC<ScheduleFlightModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto">
+      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Schedule New Flight</DialogTitle>
         </DialogHeader>
