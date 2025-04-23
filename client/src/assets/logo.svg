@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <defs>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+  </defs>
+  <rect width="240" height="80" rx="10" fill="transparent" />
+  <g fill="url(#logo-gradient)" transform="translate(20, 10)">
+    <path d="M30 10 C42 10 50 18 50 30 C50 42 42 50 30 50 L10 50 L10 10 L30 10 Z M30 20 L20 20 L20 40 L30 40 C36 40 40 36 40 30 C40 24 36 20 30 20 Z" />
+    <path d="M80 10 C92 10 100 18 100 30 C100 42 92 50 80 50 L60 50 L60 10 L80 10 Z M80 20 L70 20 L70 40 L80 40 C86 40 90 36 90 30 C90 24 86 20 80 20 Z" />
+    <path d="M110 10 L135 10 L160 50 L145 50 L140 40 L105 40 L100 50 L85 50 L110 10 Z M110 30 L120 30 L115 20 L110 30 Z" />
+  </g>
+  <text x="120" y="70" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#3B82F6">FLIGHT ACADEMY</text>
+</svg>

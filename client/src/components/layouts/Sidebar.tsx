@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { User } from "@shared/schema";
 import { useAuth } from "@/context/AuthContext";
+import logoSvg from "@/assets/logo.svg";
 
 interface SidebarProps {
   user: {
@@ -31,11 +32,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activePage }) => {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-screen">
       <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 22h14a2 2 0 002-2V9a1 1 0 00-1-1h-3v-.777c0-2.896-1.2-5.545-3.134-7.447a1 1 0 00-1.732 0C10.2 2.678 9 5.327 9 8.223V8H6a1 1 0 00-1 1v11a2 2 0 002 2z" />
-          </svg>
-          <h1 className="text-xl font-semibold text-gray-900">FlightTrack</h1>
+        <div className="flex items-center">
+          <img src={logoSvg} alt="DDJ Flight Academy" className="h-10" />
         </div>
       </div>
       
